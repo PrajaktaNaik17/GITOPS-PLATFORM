@@ -1,6 +1,6 @@
 A production-ready deployment platform that combines GitOps workflows, blue-green deployments, and automated disaster recovery.
 
-## 🚀 Features
+##  Features
 
 - **Zero-downtime deployments** with blue-green strategy
 - **GitOps workflow** using ArgoCD
@@ -9,7 +9,7 @@ A production-ready deployment platform that combines GitOps workflows, blue-gree
 - **Real-time monitoring** and health checks
 - **One-click rollback** capabilities
 
-## 🏗️ Architecture
+##  Architecture
 
 ```
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
@@ -30,7 +30,7 @@ A production-ready deployment platform that combines GitOps workflows, blue-gree
                                └─────────────────┘    └─────────────────┘
 ```
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 - **Frontend**: Node.js, Express, HTML5
 - **Database**: PostgreSQL (RDS)
@@ -40,7 +40,7 @@ A production-ready deployment platform that combines GitOps workflows, blue-gree
 - **Monitoring**: CloudWatch, Grafana
 - **CI/CD**: GitHub Actions
 
-## 📋 Prerequisites
+## Prerequisites
 
 - AWS Account with appropriate permissions
 - Docker installed locally
@@ -48,7 +48,7 @@ A production-ready deployment platform that combines GitOps workflows, blue-gree
 - Git configured
 - Terraform installed (optional for local development)
 
-## 🚀 Quick Start
+## Quick Start
 
 1. **Clone and setup local environment:**
    ```bash
@@ -90,7 +90,7 @@ gitops-platform/
     └── workflows/        # CI/CD pipelines
 ```
 
-## 🔧 Development Commands
+##  Development Commands
 
 - `npm start` - Start the application
 - `npm run dev` - Start with auto-reload
@@ -98,7 +98,7 @@ gitops-platform/
 - `docker-compose up` - Start full local environment
 - `docker-compose down` - Stop local environment
 
-## 📊 Monitoring
+## Monitoring
 
 The platform includes comprehensive monitoring:
 
@@ -107,7 +107,7 @@ The platform includes comprehensive monitoring:
 - **Infrastructure Metrics**: CPU, memory, disk usage
 - **Business Metrics**: Uptime, response time, error rate
 
-## 🔒 Security Features
+##  Security Features
 
 - Non-root container execution
 - Database connection encryption
@@ -115,14 +115,14 @@ The platform includes comprehensive monitoring:
 - Network security groups
 - Regular security updates
 
-## 📈 Performance
+##  Performance
 
 - **Deployment Time**: < 10 minutes
 - **Recovery Time**: < 5 minutes
 - **Uptime Target**: 99.9%
 - **Zero Downtime**: Guaranteed during deployments
 
-## 🤝 Contributing
+##  Contributing
 
 1. Fork the repository
 2. Create a feature branch
@@ -130,6 +130,7 @@ The platform includes comprehensive monitoring:
 4. Test thoroughly
 5. Submit a pull request
 
-## 📝 License
+## 
+License
 
 MIT License - see LICENSE file for details
