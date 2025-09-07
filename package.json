@@ -1,0 +1,26 @@
+{
+    "name": "gitops-demo-app",
+    "version": "1.0.0",
+    "description": "Demo application for GitOps with Blue-Green deployment",
+    "main": "app.js",
+    "scripts": {
+      "start": "node app.js",
+      "dev": "nodemon app.js",
+      "test": "jest",
+      "test:health": "curl -f http://localhost:3000/health || exit 1"
+    },
+    "dependencies": {
+      "express": "^4.18.2",
+      "pg": "^8.11.0"
+    },
+    "devDependencies": {
+      "nodemon": "^3.0.1",
+      "jest": "^29.7.0",
+      "supertest": "^6.3.3"
+    },
+    "engines": {
+      "node": ">=18.0.0"
+    },
+    "author": "Your Name",
+    "license": "MIT"
+  }

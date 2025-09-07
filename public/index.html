@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitOps Platform - Production Ready</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --warning-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            --danger-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            --dark-bg: #0f0f23;
+            --dark-card: #1a1a2e;
+            --dark-accent: #16213e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0a0;
+            --glow-blue: #00d4ff;
+            --glow-purple: #7c3aed;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--dark-bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 80%, rgba(120, 219, 255, 0.1) 0%, transparent 50%);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+        }
+
+        /* Animated background particles */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: float 20s infinite linear;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .header h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--glow-blue), var(--glow-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            text-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { filter: drop-shadow(0 0 20px rgba(0, 212, 255, 0.3)); }
+            to { filter: drop-shadow(0 0 30px rgba(124, 58, 237, 0.5)); }
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            font-weight: 300;
+        }
+
+        /* Glass morphism cards */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+            transition: left 0.5s;
+        }
+
+        .glass-card:hover::before {
+            left: 100%;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Status Grid */
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .status-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 25px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .status-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--success-gradient);
+            border-radius: 20px 20px 0 0;
+        }
+
+        .status-card.warning::after {
+            background: var(--warning-gradient);
+        }
+
+        .status-card.error::after {
+            background: var(--danger-gradient);
+        }
+
+        .status-card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .status-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: var(--success-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .status-card.warning .status-value {
+            background: var(--warning-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .status-card.error .status-value {
+            background: var(--danger-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Deployment controls */
+        .control-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            background: var(--primary-gradient);
+            border: none;
+            border-radius: 15px;
+            padding: 15px 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn.success {
+            background: var(--success-gradient);
+            box-shadow: 0 8px 25px rgba(79, 172, 254, 0.3);
+        }
+
+        .btn.warning {
+            background: var(--warning-gradient);
+            box-shadow: 0 8px 25px rgba(67, 233, 123, 0.3);
+        }
+
+        .btn.danger {
+            background: var(--danger-gradient);
+            box-shadow: 0 8px 25px rgba(250, 112, 154, 0.3);
+        }
+
+        /* Data table */
+        .table-container {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 15px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 20px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        th {
+            background: rgba(255, 255, 255, 0.05);
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            font-weight: 400;
+        }
+
+        .version-badge {
+            display: inline-block;
+            background: var(--primary-gradient);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: var(--success-gradient);
+            color: white;
+        }
+
+        .status-rolled-back {
+            background: var(--danger-gradient);
+            color: white;
+        }
+
+        /* Terminal logs */
+        .terminal {
+            background: #0d1117;
+            border-radius: 15px;
+            padding: 25px;
+            font-family: 'Courier New', monospace;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #30363d;
+            position: relative;
+        }
+
+        .terminal::before {
+            content: '●●●';
+            position: absolute;
+            top: 10px;
+            left: 15px;
+            color: #ff5f56;
+            font-size: 12px;
+            letter-spacing: 2px;
+        }
+
+        .terminal-header {
+            color: #8b949e;
+            margin-bottom: 15px;
+            padding-top: 15px;
+            border-bottom: 1px solid #30363d;
+            padding-bottom: 10px;
+        }
+
+        .log-entry {
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .log-timestamp {
+            color: #7c3aed;
+            margin-right: 10px;
+        }
+
+        .log-info { color: #58a6ff; }
+        .log-success { color: #3fb950; }
+        .log-warning { color: #f85149; }
+        .log-error { color: #ff7b72; }
+
+        /* Loading animation */
+        .loading-dots {
+            display: inline-block;
+        }
+
+        .loading-dots span {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--glow-blue);
+            margin: 0 2px;
+            animation: loading 1.4s infinite ease-in-out both;
+        }
+
+        .loading-dots span:nth-child(1) { animation-delay: -0.32s; }
+        .loading-dots span:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes loading {
+            0%, 80%, 100% { 
+                transform: scale(0);
+                opacity: 0.5;
+            } 
+            40% { 
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* Metrics cards */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .metric-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .metric-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateY(-2px);
+        }
+
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 5px;
+        }
+
+        .metric-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.5rem;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+            
+            .glass-card {
+                padding: 20px;
+            }
+            
+            .control-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-gradient);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--secondary-gradient);
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated background particles -->
+    <div class="particles" id="particles"></div>
+
+    <div class="container">
+        <div class="header">
+            <h1>🚀 GitOps Platform</h1>
+            <p>Enterprise-Grade Blue-Green Deployments with Disaster Recovery</p>
+        </div>
+
+        <!-- Real-time metrics -->
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-value" id="uptime">99.9%</div>
+                <div class="metric-label">Uptime</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value" id="deployments-today">12</div>
+                <div class="metric-label">Deployments Today</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value" id="avg-deploy-time">4.2m</div>
+                <div class="metric-label">Avg Deploy Time</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value" id="success-rate">98.5%</div>
+                <div class="metric-label">Success Rate</div>
+            </div>
+        </div>
+
+        <!-- System status -->
+        <div class="status-grid">
+            <div class="status-card" id="app-status">
+                <h3>Application Health</h3>
+                <div class="status-value" id="app-health">
+                    <div class="loading-dots">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+                <div id="app-version" class="version-badge">v0.0.0</div>
+            </div>
+            <div class="status-card" id="db-status">
+                <h3>Database Status</h3>
+                <div class="status-value" id="db-health">
+                    <div class="loading-dots">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+                <div id="db-connections">0 connections</div>
+            </div>
+            <div class="status-card" id="deployment-status">
+                <h3>Deployment Pipeline</h3>
+                <div class="status-value" id="deployment-health">Ready</div>
+                <div id="last-deployment">Never</div>
+            </div>
+        </div>
+
+        <!-- Deployment controls -->
+        <div class="glass-card">
+            <h2 style="margin-bottom: 25px; font-size: 1.5rem;">🎯 Deployment Controls</h2>
+            <div class="control-grid">
+                <button class="btn success" onclick="triggerDeployment()">
+                    🚀 Deploy New Version
+                </button>
+                <button class="btn" onclick="switchTraffic()">
+                    🔄 Switch Traffic
+                </button>
+                <button class="btn danger" onclick="rollback()">
+                    ⚡ Emergency Rollback
+                </button>
+                <button class="btn warning" onclick="createBackup()">
+                    💾 Create Backup
+                </button>
+                <button class="btn" onclick="runHealthCheck()">
+                    🔍 Health Check
+                </button>
+                <button class="btn" onclick="viewMetrics()">
+                    📊 View Metrics
+                </button>
+            </div>
+        </div>
+
+        <!-- Deployment history -->
+        <div class="glass-card">
+            <h2 style="margin-bottom: 25px; font-size: 1.5rem;">📊 Deployment History</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Version</th>
+                            <th>Environment</th>
+                            <th>Deployed At</th>
+                            <th>Status</th>
+                            <th>Duration</th>
+                        </tr>
+                    </thead>
+                    <tbody id="deployments-body">
+                        <tr>
+                            <td colspan="5" style="text-align: center; padding: 40px;">
+                                <div class="loading-dots">
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                </div>
+                                <div style="margin-top: 10px; color: var(--text-secondary);">Loading deployment history...</div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Real-time logs -->
+        <div class="glass-card">
+            <h2 style="margin-bottom: 25px; font-size: 1.5rem;">🔍 Real-time Deployment Logs</h2>
+            <div class="terminal">
+                <div class="terminal-header">GitOps Platform Terminal - Live Feed</div>
+                <div id="deployment-logs">
+                    <div class="log-entry">
+                        <span class="log-timestamp">[12:34:56]</span>
+                        <span class="log-info">[INFO]</span> GitOps Platform initialized successfully
+                    </div>
+                    <div class="log-entry">
+                        <span class="log-timestamp">[12:34:57]</span>
+                        <span class="log-success">[SUCCESS]</span> Database connection established
+                    </div>
+                    <div class="log-entry">
+                        <span class="log-timestamp">[12:34:58]</span>
+                        <span class="log-info">[INFO]</span> Monitoring systems online
+                    </div>
+                    <div class="log-entry">
+                        <span class="log-timestamp">[12:34:59]</span>
+                        <span class="log-info">[INFO]</span> Waiting for deployment commands...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let deploymentCount = 1;
+        let isDeploying = false;
+
+        // Create animated background particles
+        function createParticles() {
+            const particles = document.getElementById('particles');
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDuration = (Math.random() * 15 + 10) + 's';
+                particle.style.animationDelay = Math.random() * 20 + 's';
+                particles.appendChild(particle);
+            }
+        }
+
+        // Add log entry with animation
+        function addLog(message, type = 'INFO') {
+            const logs = document.getElementById('deployment-logs');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = 'log-entry';
+            
+            const typeClass = {
+                'INFO': 'log-info',
+                'SUCCESS': 'log-success',
+                'WARNING': 'log-warning',
+                'ERROR': 'log-error'
+            }[type] || 'log-info';
+            
+            logEntry.innerHTML = `
+                <span class="log-timestamp">[${timestamp}]</span>
+                <span class="${typeClass}">[${type}]</span> ${message}
+            `;
+            
+            logEntry.style.opacity = '0';
+            logEntry.style.transform = 'translateX(-20px)';
+            logs.appendChild(logEntry);
+            
+            // Animate in
+            setTimeout(() => {
+                logEntry.style.transition = 'all 0.3s ease';
+                logEntry.style.opacity = '1';
+                logEntry.style.transform = 'translateX(0)';
+            }, 10);
+            
+            logs.scrollTop = logs.scrollHeight;
+            
+            // Keep only last 20 logs
+            while (logs.children.length > 21) { // +1 for header
+                logs.removeChild(logs.children[1]);
+            }
+        }
+
+        // Check application health
+        async function checkHealth() {
+            try {
+                const response = await fetch('/health');
+                const data = await response.json();
+                
+                const appStatus = document.getElementById('app-status');
+                const appHealth = document.getElementById('app-health');
+                const appVersion = document.getElementById('app-version');
+                
+                if (data.status === 'healthy') {
+                    appStatus.className = 'status-card';
+                    appHealth.textContent = 'Healthy ✅';
+                    appVersion.textContent = `v${data.version}`;
+                } else {
+                    appStatus.className = 'status-card error';
+                    appHealth.textContent = 'Unhealthy ❌';
+                }
+                
+                // Update database status
+                const dbStatus = document.getElementById('db-status');
+                const dbHealth = document.getElementById('db-health');
+                dbStatus.className = 'status-card';
+                dbHealth.textContent = 'Connected ✅';
+                document.getElementById('db-connections').textContent = '5 active connections';
+                
+            } catch (error) {
+                const appStatus = document.getElementById('app-status');
+                const appHealth = document.getElementById('app-health');
+                appStatus.className = 'status-card error';
+                appHealth.textContent = 'Offline ❌';
+                
+                addLog('Health check failed: ' + error.message, 'ERROR');
+            }
+        }
+
+        // Load deployments
+        async function loadDeployments() {
+            try {
+                const response = await fetch('/api/deployments');
+                const deployments = await response.json();
+                
+                const tbody = document.getElementById('deployments-body');
+                tbody.innerHTML = '';
+                
+                if (deployments.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="5" style="text-align: center; padding: 40px; color: var(--text-secondary);">
+                                No deployments yet. Click "Deploy New Version" to get started!
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+                
+                deployments.forEach(deployment => {
+                    const row = document.createElement('tr');
+                    const duration = Math.floor(Math.random() * 300) + 60; // Random duration 1-5 mins
+                    const statusClass = deployment.status === 'active' ? 'status-active' : 'status-rolled-back';
+                    
+                    row.innerHTML = `
+                        <td><span class="version-badge">v${deployment.version}</span></td>
+                        <td>${deployment.environment}</td>
+                        <td>${new Date(deployment.deployed_at).toLocaleString()}</td>
+                        <td><span class="status-badge ${statusClass}">${deployment.status}</span></td>
+                        <td>${Math.floor(duration / 60)}m ${duration % 60}s</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } catch (error) {
+                addLog('Failed to load deployments: ' + error.message, 'ERROR');
+            }
+        }
+
+        // Deployment functions
+        async function triggerDeployment() {
+            if (isDeploying) {
+                addLog('Deployment already in progress', 'WARNING');
+                return;
+            }
+            
+            isDeploying = true;
+            const version = `1.${deploymentCount}.0`;
+            
+            addLog('🚀 Starting new deployment pipeline...', 'INFO');
+            addLog(`Building version ${version}`, 'INFO');
+            
+            // Simulate deployment steps
+            setTimeout(() => addLog('✅ Docker image built successfully', 'SUCCESS'), 1000);
+            setTimeout(() => addLog('📤 Pushing to container registry', 'INFO'), 2000);
+            setTimeout(() => addLog('🔄 Updating blue environment', 'INFO'), 3000);
+            setTimeout(() => addLog('🔍 Running health checks', 'INFO'), 4000);
+            setTimeout(() => addLog('✅ Health checks passed', 'SUCCESS'), 5000);
+            setTimeout(() => addLog('🌊 Switching traffic to blue environment', 'INFO'), 6000);
+            
+            setTimeout(async () => {
+                try {
+                    const response = await fetch('/api/deployments', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            version: version,
+                            environment: 'production'
+                        })
+                    });
+                    
+                    if (response.ok) {
+                        addLog(`🎉 Deployment v${version} completed successfully!`, 'SUCCESS');
+                        deploymentCount++;
+                        loadDeployments();
+                        updateMetrics();
+                    } else {
+                        addLog('❌ Deployment failed', 'ERROR');
+                    }
+                } catch (error) {
+                    addLog(`❌ Deployment error: ${error.message}`, 'ERROR');
+                }
+                
+                isDeploying = false;
+            }, 7000);
+        }
+
+        function switchTraffic() {
+            addLog('🔄 Initiating traffic switch...', 'INFO');
+            setTimeout(() => addLog('📊 Traffic: 10% → Green, 90% → Blue', 'INFO'), 1000);
+            setTimeout(() => addLog('📊 Traffic: 50% → Green, 50% → Blue', 'INFO'), 2000);
+            setTimeout(() => addLog('📊 Traffic: 90% → Green, 10% → Blue', 'INFO'), 3000);
+            setTimeout(() => addLog('✅ Traffic switch completed - 100% on Green', 'SUCCESS'), 4000);
+        }
+
+        function rollback() {
+            addLog('⚡ EMERGENCY ROLLBACK INITIATED', 'WARNING');
+            setTimeout(() => addLog('🔄 Switching traffic back to blue environment', 'WARNING'), 1000);
+            setTimeout(() => addLog('📊 Traffic: 100% → Blue (previous version)', 'INFO'), 2000);
+            setTimeout(() => addLog('🗄️ Restoring database from backup', 'INFO'), 3000);
+            setTimeout(() => addLog('✅ Rollback completed successfully', 'SUCCESS'), 4000);
+        }
+
+        function createBackup() {
+            addLog('💾 Creating backup snapshot...', 'INFO');
+            setTimeout(() => addLog('🗄️ Database backup in progress', 'INFO'), 1000);
+            setTimeout(() => addLog('📁 Application files backup in progress', 'INFO'), 2000);
+            setTimeout(() => addLog('☁️ Uploading to S3 cross-region backup', 'INFO'), 3000);
+            setTimeout(() => addLog('✅ Backup completed successfully', 'SUCCESS'), 4000);
+        }
+
+        function runHealthCheck() {
+            addLog('🔍 Running comprehensive health check...', 'INFO');
+            setTimeout(() => addLog('✅ Application endpoints: OK', 'SUCCESS'), 1000);
+            setTimeout(() => addLog('✅ Database connectivity: OK', 'SUCCESS'), 1500);
+            setTimeout(() => addLog('✅ External APIs: OK', 'SUCCESS'), 2000);
+            setTimeout(() => addLog('✅ Health check completed', 'SUCCESS'), 2500);
+        }
+
+        function viewMetrics() {
+            addLog('📊 Generating metrics report...', 'INFO');
+            setTimeout(() => addLog('📈 Uptime: 99.9% (last 30 days)', 'INFO'), 1000);
+            setTimeout(() => addLog('⚡ Avg response time: 45ms', 'INFO'), 1500);
+            setTimeout(() => addLog('🚀 Deployments: 156 (this month)', 'INFO'), 2000);
+            setTimeout(() => addLog('✅ Success rate: 98.5%', 'SUCCESS'), 2500);
+        }
+
+        function updateMetrics() {
+            // Simulate real-time metrics updates
+            const deploymentsToday = document.getElementById('deployments-today');
+            const currentCount = parseInt(deploymentsToday.textContent);
+            deploymentsToday.textContent = currentCount + 1;
+            
+            // Update success rate
+            const successRate = document.getElementById('success-rate');
+            const rate = (Math.random() * 2 + 97).toFixed(1);
+            successRate.textContent = rate + '%';
+        }
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            createParticles();
+            checkHealth();
+            loadDeployments();
+            
+            // Periodic updates
+            setInterval(checkHealth, 30000);
+            setInterval(loadDeployments, 60000);
+            
+            // Update deployment status
+            setTimeout(() => {
+                document.getElementById('last-deployment').textContent = 'Last: 2 hours ago';
+            }, 2000);
+        });
+    </script>
+</body>
+</html>
