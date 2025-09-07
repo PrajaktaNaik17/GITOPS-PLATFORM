@@ -3,7 +3,6 @@ A production-ready deployment platform that combines GitOps workflows, blue-gree
 ##  Features
 
 - **Zero-downtime deployments** with blue-green strategy
-- **GitOps workflow** using ArgoCD
 - **Automated disaster recovery** with cross-region backups
 - **Infrastructure as Code** using Terraform
 - **Real-time monitoring** and health checks
