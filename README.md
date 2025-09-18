@@ -1,135 +1,145 @@
-A production-ready deployment platform that combines GitOps workflows, blue-green deployments, and automated disaster recovery.
+# GitOps Platform - Blue-Green Deployment System
 
-##  Features
+A container-based deployment platform implementing blue-green deployment patterns with automated infrastructure management.
 
-- **Zero-downtime deployments** with blue-green strategy
-- **Automated disaster recovery** with cross-region backups
-- **Infrastructure as Code** using Terraform
-- **Real-time monitoring** and health checks
-- **One-click rollback** capabilities
+## What It Does
 
-##  Architecture
+- **Blue-green deployments** with zero-downtime switching
+- **Database backup automation** before deployments
+- **Cross-region disaster recovery** with S3 replication
+- **Infrastructure monitoring** via CloudWatch dashboards
+- **One-click rollback** when deployments fail
+
+## Architecture
 
 ```
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Developer     │    │   GitHub        │    │   ArgoCD        │
-│   Commits Code  │───▶│   Repository    │───▶│   Deployment    │
+│   Developer     │    │   Load          │    │   ECS Services  │
+│   Pushes Image  │───▶│   Balancer      │───▶│   Blue/Green    │
 └─────────────────┘    └─────────────────┘    └─────────────────┘
-                                                       │
-                                                       ▼
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Monitoring    │    │   Load          │    │   ECS Services  │
-│   & Alerts      │◀───│   Balancer      │◀───│   Blue/Green    │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-                                                       │
-                                                       ▼
-                               ┌─────────────────┐    ┌─────────────────┐
-                               │   S3 Backups    │    │   RDS Database  │
-                               │   Cross-Region  │    │   Multi-AZ      │
-                               └─────────────────┘    └─────────────────┘
+                                │                       │
+                                ▼                       ▼
+                       ┌─────────────────┐    ┌─────────────────┐
+                       │   CloudWatch    │    │   PostgreSQL    │
+                       │   Monitoring    │    │   RDS Multi-AZ  │
+                       └─────────────────┘    └─────────────────┘
 ```
 
 ## Tech Stack
 
-- **Frontend**: Node.js, Express, HTML5
-- **Database**: PostgreSQL (RDS)
-- **Container**: Docker, Amazon ECS
-- **Infrastructure**: Terraform, AWS (ALB, S3, RDS)
-- **GitOps**: ArgoCD
-- **Monitoring**: CloudWatch, Grafana
-- **CI/CD**: GitHub Actions
+- **Application**: Node.js + Express
+- **Database**: PostgreSQL on RDS
+- **Containers**: Docker + ECS Fargate
+- **Infrastructure**: Terraform
+- **Monitoring**: CloudWatch
+- **Storage**: S3 with cross-region replication
 
-## Prerequisites
+## Project Structure
 
-- AWS Account with appropriate permissions
-- Docker installed locally
-- Node.js 18+ installed
-- Git configured
-- Terraform installed (optional for local development)
+```
+├── app.js                    # Main application
+├── Dockerfile               # Container configuration
+├── docker-compose.yml       # Local development
+├── package.json             
+├── public/
+│   └── index.html           # Deployment dashboard
+├── scripts/
+│   ├── blue-green-deploy.sh # Deployment automation
+│   ├── deploy.sh            # Build and deploy script
+│   └── init-db.sql          # Database setup
+└── terraform/               # Infrastructure as Code
+    ├── main.tf              # Core infrastructure
+    ├── ecs.tf               # Container services
+    ├── database.tf          # RDS configuration
+    ├── storage.tf           # S3 backup setup
+    ├── monitoring.tf        # CloudWatch resources
+    ├── variables.tf         # Configuration variables
+    └── outputs.tf           # Resource outputs
+```
 
 ## Quick Start
 
-1. **Clone and setup local environment:**
-   ```bash
-   git clone <your-repo>
-   cd gitops-platform
-   npm install
-   ```
-
-2. **Start local development environment:**
-   ```bash
-   docker-compose up -d
-   ```
-
-3. **Access the application:**
-   - Application: http://localhost:3000
-   - Health Check: http://localhost:3000/health
-   - Version Info: http://localhost:3000/version
-
-## 📁 Project Structure
-
-```
-gitops-platform/
-├── app.js                 # Main application
-├── package.json           # Node.js dependencies
-├── Dockerfile            # Container configuration
-├── docker-compose.yml    # Local development setup
-├── public/
-│   └── index.html        # Frontend dashboard
-├── scripts/
-│   └── init-db.sql       # Database initialization
-├── terraform/            # Infrastructure as Code
-│   ├── main.tf
-│   ├── variables.tf
-│   └── outputs.tf
-├── gitops/               # ArgoCD configurations
-│   ├── applications/
-│   └── environments/
-└── .github/
-    └── workflows/        # CI/CD pipelines
+**Local Development:**
+```bash
+git clone <repository>
+cd gitops-platform
+npm install
+docker-compose up
 ```
 
-##  Development Commands
+**Infrastructure Deployment:**
+```bash
+cd terraform
+terraform init
+terraform plan
+terraform apply
+```
 
-- `npm start` - Start the application
-- `npm run dev` - Start with auto-reload
-- `npm test` - Run tests
-- `docker-compose up` - Start full local environment
-- `docker-compose down` - Stop local environment
+**Application Deployment:**
+```bash
+./scripts/deploy.sh build
+./scripts/deploy.sh deploy
+```
 
-## Monitoring
+## Key Features
 
-The platform includes comprehensive monitoring:
+**Blue-Green Deployment Process:**
+1. Build new container image
+2. Deploy to inactive environment (green)
+3. Run health checks on new deployment
+4. Switch load balancer traffic
+5. Scale down old environment (blue)
 
-- **Health Checks**: Automated endpoint monitoring
-- **Deployment Metrics**: Success rate, duration, rollback frequency
-- **Infrastructure Metrics**: CPU, memory, disk usage
-- **Business Metrics**: Uptime, response time, error rate
+**Automated Backup System:**
+- RDS automated backups with 7-day retention
+- Cross-region S3 replication for disaster recovery
+- Pre-deployment database snapshots
 
-##  Security Features
+**Monitoring Stack:**
+- Application health checks at `/health` endpoint
+- ECS service metrics (CPU, memory, task count)
+- RDS performance monitoring
+- Custom CloudWatch dashboard
 
+## Infrastructure Components
+
+- **VPC**: Isolated network with public/private subnets
+- **ECS Cluster**: Fargate-based container orchestration
+- **Application Load Balancer**: Traffic distribution with health checks
+- **RDS Multi-AZ**: High-availability PostgreSQL database
+- **S3 Buckets**: Primary and replica backup storage
+- **CloudWatch**: Centralized logging and monitoring
+
+## Security
+
+- Containers run in private subnets
+- Database connections use SSL encryption
+- Secrets stored in AWS Secrets Manager
+- Security groups restrict network access
 - Non-root container execution
-- Database connection encryption
-- Environment variable management
-- Network security groups
-- Regular security updates
 
-##  Performance
+## Development Commands
 
-- **Deployment Time**: < 10 minutes
-- **Recovery Time**: < 5 minutes
-- **Uptime Target**: 99.9%
-- **Zero Downtime**: Guaranteed during deployments
+```bash
+npm start              # Start application locally
+npm test              # Run test suite
+docker-compose up     # Full local environment
+./scripts/deploy.sh   # Deploy to AWS
+terraform plan        # Preview infrastructure changes
+```
 
-##  Contributing
+## Requirements
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
+- AWS account with appropriate IAM permissions
+- Docker installed locally
+- Node.js 18+ 
+- Terraform (for infrastructure management)
 
-## 
-License
+## Performance Characteristics
 
-MIT License - see LICENSE file for details
+- **Deployment time**: 8-12 minutes end-to-end
+- **Recovery time**: Under 5 minutes with automated rollback
+- **Database backup**: Automated daily snapshots
+- **Container startup**: 30-60 seconds per instance
+
+This platform demonstrates production deployment patterns including infrastructure automation, container orchestration, and disaster recovery procedures suitable for applications requiring high availability.
